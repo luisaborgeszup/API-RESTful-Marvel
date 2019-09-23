@@ -1,0 +1,20 @@
+docker:
+	~docker ps -a
+	~docker stop -container
+	~docker rm -container	
+	~mongod --dbpath API-RESTful-Marvel/data/
+
+new terminal:
+	~mongo
+	~use API-RESTful-Marvel
+	~usersList = [{'name': 'luisaborgeszup', 'email': 'luisa.borges@zup.com.br', 'password': '331000'}, {'name': 'fulanim1', 'email': 		'fulanim.ciclanim@zup.com.br', 'password': 'b3utr4no'}]
+	~db.users.insert(usersList)
+	~db.users.find().pretty()
+	~db.dropDatabase()
+
+kill localhost:
+	~lsof -t -i:3000
+	~kill -9 porta
+
+
+
