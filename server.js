@@ -29,7 +29,15 @@ app.get('/users/:id', (req, res, next) => {
 })
 
 app.post('/users', (req, res, next) => {
-    const newUser = new User({ username: req.body.username, email: req.body.email, password: req.body.password})
+    const newUser = new User({
+        gender: req.body.gender,
+        name: {first: req.body.name.first, last: req.body.name.last},
+        email: req.body.email,
+        dob: {date: req.body.dob.date},
+        location: {street: req.body.location.street},
+        phone: req.body.phone,
+        password: {password: req.body.login.password}
+    })
     newUser.save((err) => {
         if (err) {
             res.status(500).json({ error: err.message })
@@ -52,8 +60,16 @@ app.delete('/users/:id', (req, res) => {
     })
 })
 
-app.post('/users/:id/update', (req, res, next) => {
-    req.newData = {username: req.body.username, email: req.body.email, password: req.body.password}
+app.put('/users/:id', (req, res, next) => {
+    req.newData = {
+        gender: req.body.gender,
+        name: {first: req.body.name.first, last: req.body.name.last},
+        email: req.body.email,
+        dob: {date: req.body.dob.date},
+        location: {street: req.body.location.street},
+        phone: req.body.phone,
+        password: {password: req.body.login.password}
+    }
     User.findOneAndUpdate({ _id: req.params.id }, req.newData, {upsert:true}, function(err, doc){
         if (err) return res.send(500, { error: err });
         return res.send("succesfully saved");
