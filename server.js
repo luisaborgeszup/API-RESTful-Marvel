@@ -3,7 +3,8 @@ const express = require('express')
 const mongoose = require('mongoose')
 const User = require('./user')
 const app = express()
-const port = 3000
+const port = 8000
+const MongoClient = require('mongodb').MongoClient
 
 app.listen(port, () => console.log(`App listening on port ${port}`))
 
@@ -11,7 +12,7 @@ app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: true }))
 
 app.get('/', (req, res) => { 
-    res.send()
+    res.send("API-RESTful-Marvel")
 })
 
 app.get('/users', (req, res, next) => {
@@ -21,8 +22,16 @@ app.get('/users', (req, res, next) => {
     })
 })
 
-app.get('/users/:id', (req, res, next) => {
-    User.find({ _id: req.params.id }).lean().exec((e, docs) => {
+// app.get('/users/:id', (req, res, next) => {
+//     User.find({ _id: req.params.id }).lean().exec((e, docs) => {
+//         res.json(docs)
+//         res.end()
+
+//     })
+// })
+
+app.get('/users/:username', (req, res, next) => {
+    User.find({ login : {username: req.params.username }}).lean().exec((e, docs) => {
         res.json(docs)
         res.end()
     })
@@ -36,7 +45,7 @@ app.post('/users', (req, res, next) => {
         dob: {date: req.body.dob.date},
         location: {street: req.body.location.street},
         phone: req.body.phone,
-        password: {password: req.body.login.password}
+        login: {username: req.body.login.username}
     })
     newUser.save((err) => {
         if (err) {
@@ -68,7 +77,7 @@ app.put('/users/:id', (req, res, next) => {
         dob: {date: req.body.dob.date},
         location: {street: req.body.location.street},
         phone: req.body.phone,
-        password: {password: req.body.login.password}
+        login: {username: req.body.login.username}
     }
     User.findOneAndUpdate({ _id: req.params.id }, req.newData, {upsert:true}, function(err, doc){
         if (err) return res.send(500, { error: err });

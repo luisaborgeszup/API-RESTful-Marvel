@@ -7,12 +7,10 @@ mongoose.connect('mongodb://localhost/API-RESTful-Marvel')
 const createUser = new mongoose.Schema({
     "name": {
         "first": {
-            type: String,
-            unique: true
+            type: String
         },
         "last": {
-            type: String,
-            unique: true
+            type: String
         }
     },
     "gender": {
@@ -37,17 +35,24 @@ const createUser = new mongoose.Schema({
         unique: true
     },
     "login": {
-        "password": {
+        "username": {
             type: String,
             unique: true
         }
     }
 }, { collection: 'users' })
 
+createUser.methods.toAuthJSON = function(){
+    return {
+        username: this.username,
+        email: this.email
+    }
+}
+
 createUser.pre('remove', function(next) {
-    this.model('User').deleteMany({ user: this.uuid }, next);
+    this.model('user').deleteMany({ user: this.uuid }, next);
 })
 
-const User = mongoose.model('User', createUser, 'users')
+const User = mongoose.model("User", createUser, "users")
  
 module.exports = User
