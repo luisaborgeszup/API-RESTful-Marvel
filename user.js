@@ -20,13 +20,24 @@ const createUser = new mongoose.Schema({
         type: String,
         unique: true
     },
-    "dob": {
-        "date": {
-            type: Date,
-        }
-    },
+    // "dob": {
+    //     "date": {
+    //         type: Date,
+    //     }
+    // },
     "location": {
         "street": {
+            number: {
+                type: Number,
+            },
+            name: {
+                type: String
+            }
+        },
+        "city": {
+            type: String,
+        },
+        "state": {
             type: String,
         }
     },
@@ -39,15 +50,22 @@ const createUser = new mongoose.Schema({
             type: String,
             unique: true
         }
-    }
+    },
+    "picture": {
+        "large": {
+            type: String,
+            unique: true
+        },
+        "medium": {
+            type: String,
+            unique: true
+        },
+        "thumbnail": {
+            type: String,
+            unique: true
+        }
+    },
 }, { collection: 'users' })
-
-createUser.methods.toAuthJSON = function(){
-    return {
-        username: this.username,
-        email: this.email
-    }
-}
 
 createUser.pre('remove', function(next) {
     this.model('user').deleteMany({ user: this.uuid }, next);
