@@ -28,7 +28,7 @@ app.get('/users', (req, res, next) => {
 
 app.get('/api', (req, res, next) => {
   request({
-    url: 'https://randomuser.me/api/?inc=gender,name,email,location,phone,login,picture',
+    url: 'https://randomuser.me/api/?nat=br',
     qs: User
   }, (error, response, body) => {
     if (error) {
@@ -52,11 +52,11 @@ app.get('/users/:username', (req, res, next) => {
 
 app.post('/users', (req, res, next) => {
   request({
-    url: 'https://randomuser.me/api/?inc=gender,name,email,location,phone,login,picture',
+    url: 'https://randomuser.me/api/?nat=br',
     qs: User
   }, (error, response, body) => {
     if (error) {
-      res.send('An erorr occured')
+      res.send('An error occured')
     } else {
       const teste = JSON.parse(body)
       teste.results.map(i => {
@@ -65,11 +65,10 @@ app.post('/users', (req, res, next) => {
           if (err) {
             console.log(err)
           }
-          console.log("salvou esse")
         })
       })
       res.send({
-        salvo: "ok"
+        salvo: "User created"
       })
     }
   })
@@ -116,6 +115,7 @@ app.put('/users/:id', (req, res, next) => {
       thumbnail: req.body.picture.thumbnail
     }
   }
+  
   User.findOneAndUpdate({
     _id: req.params.id
   }, req.newData, {
