@@ -20,7 +20,21 @@ app.get('/', (req, res) => {
 })
 
 app.get('/users', (req, res, next) => {
-  User.find({}).lean().exec((e, docs) => {
+  User.find({class: "all"}).lean().exec((e, docs) => {
+    res.json(docs)
+    res.end()
+  })
+})
+
+app.get('/checked', (req, res, next) => {
+  User.find({class: "checked"}).lean().exec((e, docs) => {
+    res.json(docs)
+    res.end()
+  })
+})
+
+app.get('/discarted', (req, res, next) => {
+  User.find({class: "discarted"}).lean().exec((e, docs) => {
     res.json(docs)
     res.end()
   })
@@ -39,12 +53,21 @@ app.get('/api', (req, res, next) => {
   })
 })
 
-app.get('/users/:username', (req, res, next) => {
+app.get('/users/names/:first', (req, res, next) => {
   User.find({
-    login: {
-      username: req.params.username
-    }
-  }).lean().exec((e, docs) => {
+    "name.first": req.params.first
+  }).exec((e, docs) => {
+    console.log(e)
+    res.json(docs)
+    res.end()
+  })
+})
+
+app.get('/users/emails/:email', (req, res, next) => {
+  User.find({
+    email: req.params.email
+  }).exec((e, docs) => {
+    console.log(e)
     res.json(docs)
     res.end()
   })
@@ -60,10 +83,10 @@ app.post('/users', (req, res, next) => {
     } else {
       const teste = JSON.parse(body)
       teste.results.map(i => {
-        const newUser = new User(i)
+        const newUser = new User({...i, class: "all"})
         newUser.save((err) => {
           if (err) {
-            console.log(err)
+            res.status(500).json({ error: err.message })
           }
         })
       })
@@ -74,32 +97,14 @@ app.post('/users', (req, res, next) => {
   })
 })
 
-app.delete('/users/:id', (req, res) => {
-  User.remove({
-    _id: req.params.id
-  }).lean().exec((err) => {
-    if (err) {
-      res.status(500).json({
-        error: err.message
-      })
-      res.end()
-      return
-    }
-    res.send('User deleted')
-  })
-})
-
-app.put('/users/:id', (req, res, next) => {
-  req.newData = {
+app.post('/checked', (req, res, next) => {
+  const newUser = [new User({
     gender: req.body.gender,
     name: {
       first: req.body.name.first,
       last: req.body.name.last
     },
     email: req.body.email,
-    dob: {
-      date: req.body.dob.date
-    },
     location: {
       street: req.body.location.street,
       city: req.body.location.city,
@@ -113,11 +118,92 @@ app.put('/users/:id', (req, res, next) => {
       large: req.body.picture.large,
       medium: req.body.picture.medium,
       thumbnail: req.body.picture.thumbnail
+    },
+    class: req.body.class
+  })]
+  newUser.save((err) => {
+    if (err) {
+      res.status(500).json({ error: err.message })
     }
+  })
+})
+
+app.post('/discarted', (req, res, next) => {
+  console.log(JSON.stringify(req.body))
+  const newUser = new User({
+    gender: req.body.gender,
+    name: {
+      first: req.body.name.first,
+      last: req.body.name.last
+    },
+    email: req.body.email,
+    location: {
+      street: req.body.location.street,
+      city: req.body.location.city,
+      state: req.body.location.state
+    },
+    phone: req.body.phone,
+    login: {
+      username: req.body.login.username
+    },
+    picture: {
+      large: req.body.picture.large,
+      medium: req.body.picture.medium,
+      thumbnail: req.body.picture.thumbnail
+    },
+    class: req.body.class
+  })
+  newUser.save((err) => {
+    console.log(err)
+    if (err) {
+      res.status(500).json({ error: err.message })
+    }
+    res.send("Save")
+  })
+})
+
+app.delete('/users/emails/:email', (req, res) => {
+  User.remove({
+    email: req.params.email
+  }).lean().exec((err) => {
+    if (err) {
+      res.status(500).json({
+        error: err.message
+      })
+      res.end()
+      return
+    }
+    res.send('User deleted')
+  })
+})
+
+app.put('/users/emails/:email', (req, res, next) => {
+  req.newData = {
+    gender: req.body.gender,
+    name: {
+      first: req.body.name.first,
+      last: req.body.name.last
+    },
+    email: req.body.email,
+    location: {
+      street: req.body.location.street,
+      city: req.body.location.city,
+      state: req.body.location.state
+    },
+    phone: req.body.phone,
+    login: {
+      username: req.body.login.username
+    },
+    picture: {
+      large: req.body.picture.large,
+      medium: req.body.picture.medium,
+      thumbnail: req.body.picture.thumbnail
+    },
+    class: req.body.class
   }
   
   User.findOneAndUpdate({
-    _id: req.params.id
+    email: req.params.email
   }, req.newData, {
     upsert: true
   }, function (err, doc) {

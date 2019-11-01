@@ -20,17 +20,12 @@ const createUser = new mongoose.Schema({
     type: String,
     unique: true
   },
-  // "dob": {
-  //     "date": {
-  //         type: Date,
-  //     }
-  // },
   "location": {
     "street": {
-      number: {
+      "number": {
         type: Number,
       },
-      name: {
+      "name": {
         type: String
       }
     },
@@ -65,6 +60,9 @@ const createUser = new mongoose.Schema({
       unique: true
     }
   },
+  "class": {
+    type: String
+  }
 }, {
   collection: 'users'
 })
