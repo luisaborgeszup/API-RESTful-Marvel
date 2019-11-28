@@ -44,7 +44,15 @@ const createUser = new mongoose.Schema({
     "username": {
       type: String,
       unique: true
+    },
+    "password": {
+      type: String,
+      unique: true
     }
+  },
+  "dob": {
+    "date": String,
+    "age": Number
   },
   "picture": {
     "large": {
