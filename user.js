@@ -2,7 +2,7 @@ const bodyParser = require('body-parser')
 const express = require('express')
 const mongoose = require('mongoose')
 const app = express()
-mongoose.connect('mongodb://localhost/API-RESTful-Marvel')
+mongoose.connect('mongodb://localhost/API-RESTful-Marvel', { useNewUrlParser: true, useUnifiedTopology: true })
 
 const createUser = new mongoose.Schema({
   "name": {

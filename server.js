@@ -2,8 +2,8 @@ const bodyParser = require('body-parser')
 const express = require('express')
 const cors = require('cors')
 const request = require('request')
-const querystring = require('querystring')
 const User = require('./user')
+const pagination = require('./pagination')
 const app = express()
 const port = 8000
 
@@ -19,32 +19,20 @@ app.get('/', (req, res) => {
   res.send("API-RESTful-Marvel")
 })
 
-app.get('/users', (req, res, next) => {
-  User.find({}).lean().exec((e, docs) => {
-    res.json(docs)
-    res.end()
-  })
+app.get('/users', pagination(User), (req, res) => {
+  res.json(res.pagination)
 })
 
-app.get('/included', (req, res, next) => {
-  User.find({class: "included"}).lean().exec((e, docs) => {
-    res.json(docs)
-    res.end()
-  })
+app.get('/included', pagination(User, {class: "included"}), (req, res) => {
+  res.json(res.pagination)
 })
 
-app.get('/checked', (req, res, next) => {
-  User.find({class: "checked"}).lean().exec((e, docs) => {
-    res.json(docs)
-    res.end()
-  })
+app.get('/checked', pagination(User, {class: "checked"}), (req, res) => {
+  res.json(res.pagination)
 })
 
-app.get('/discarted', (req, res, next) => {
-  User.find({class: "deleted"}).lean().exec((e, docs) => {
-    res.json(docs)
-    res.end()
-  })
+app.get('/discarted', pagination(User, {class: "deleted"}), (req, res) => {
+  res.json(res.pagination)
 })
 
 app.get('/profile', (req, res, next) => {
@@ -104,8 +92,8 @@ app.post('/users', (req, res, next) => {
     if (error) {
       res.send('An error occured')
     } else {
-      const teste = JSON.parse(body)
-      teste.results.map(i => {
+      const data = JSON.parse(body)
+      data.results.map(i => {
         const newUser = new User({...i, class: "included"})
         newUser.save((err) => {
           if (err) {
